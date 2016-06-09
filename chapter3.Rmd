@@ -5,17 +5,17 @@ description : In addition to studying portfolio performance based on the observe
 --- type:MultipleChoiceExercise lang:r xp:50 skills:1   key:27fc122215
 ## The sources of portfolio performance
 
-Chapter 2 introduced you to the *univariate* approach of analyzing portfolio performance based on a statistical analysis of the portfolio return series. In this chapter, we consider a *multivariate* analysis and study how the portfolio performance is affected by the interaction between the performance of the individual portfolio positions. 
+Chapter 2 introduced you to the *univariate* approach of analyzing portfolio performance based on a statistical analysis of the portfolio return series. In this chapter, you will consider a *multivariate* approach. You will study how the portfolio performance is affected by the interaction between the performance of individual portfolio positions.
 
-As a motivating example, let us consider a portfolio invested in two very diverse exchange traded funds (ETFs), namely an ETF tracking the broad US equities market (ETF with symbol SPY) and an ETF track the US bonds market (ETF with symbol AGG). The monthly returns for these ETFs and the 60/40 portfolio that invests every month 60% in the equities ETF and 40% in the bonds ETF are available in the workspace as `returns_bonds`, `returns_equities` and `returns_6040`.   
+For a first example you will look at a portfolio invested in two very different *echange traded funds* (ETFs). The first is an ETF tracking the broad US equities market (ETF with the symbol SPY), and a second ETF that tracks the US bonds market (EFT with the symbol AGG). You have a portfolio that is invested 60/40, meaning that every month you invest 60% in the equities ETF (SPY), and 40% in the bonds ETF (AGG).
 
-Verify in the R-console which of the following statements is false. 
-
+These returns are in your workspace as `returns_bonds`, `returns_equities`, and `returns_6040`. Explore these returns in your console and verify which of the following statements are false.
 
 *** =instructions
-- A portfolio is less volatile than the sum of its component volatilities. This implies that the standard deviation of the 60/40 portfolio is less than `0.6*sd(returns_equities)+0.4*sd(returns_bonds)`. We call this the subadditivity property of the standard deviation.    
+
+- A portfolio is less volatile than the sum of its component volatilities. This implies that the standard deviation of the 60/40 portfolio is less than `0.6 *  sd(returns_equities) + 0.4 * sd(returns_bonds)`. We call this the subadditivity property of the standard deviation.    
 - The portfolio mean return equals the sum of the component average returns, that is, `mean(returns_6040)==0.6*mean(returns_equities)+0.4*mean(returns_bonds)`.  
-- None of the above statements is correct. 
+- None of the above statements are correct. 
 
 *** =hint
 hint
@@ -163,16 +163,19 @@ success_msg("Well done!")
 --- type:NormalExercise lang:r xp:100 skills:1 key:b6a986b0e53bd119933fc39df94f21f2bf1e4318
 ## Interpreting correlation
 
-Let us now compute the correlation between equity returns and bond returns. Just like volatilities, these correlations are dynamic. We thus need to distinguish between a static analysis computing correlations over the complete sample and a dynamic analysis computing correlations over the rolling sample. 
+Now you will learn how to compute the correlation between equity returns and bond returns. Just like volatilities, these correlations are dynamic. Therefore you need to distinguish between a static analysis that calculates correlations over a complete samples, and a dynamic analysis that calculates correlations over a rolling sample. 
+
+In this exercise you will learn 3 new functions from the PerformanceAnalytics package. These are `chart.Scatter`, `chart.Correlation`, and `chart.RollingCorrelation`. 
 
 *** =instructions
-- Plot the equity returns (`returns_equities`) against the bond returns (`returns_bonds`) using the function [chart.Scatter](http://www.rdocumentation.org/packages/PerformanceAnalytics/functions/chart.Scatter) with the bond returns on the x-asis. Do you see a relation? 
-- Compute first the correlation between the variables `returns_equities` and `returns_bonds` using the standard function [cor](). 
-- Repeat this using the function [chart.Correlation](http://www.rdocumentation.org/packages/PerformanceAnalytics/functions/chart.Correlation), with as argument the multivariate time series `returns`. 
-- Commpute the rolling 24-month estimates of the bond-equity correlation using the function [chart.RollingCorrelation](http://www.rdocumentation.org/packages/PerformanceAnalytics/functions/chart.RollingCorrelation). 
+- Plot the equity returns `returns_equities` against the bond returns `returns_bonds` using the function `chart.Scatter`. Do you see a relation? 
+- Compute first the correlation between the variables `returns_equities` and `returns_bonds` using the standard function `cor()`. 
+- Merge `returns_equities`, and `returns_bonds`, call this `returns`. 
+- Compute and visualize the correlation again except using `chart.Correlation` with `returns` as the argument.
+- Commpute the rolling 24-month estimates of the bond-equity correlation using the function `chart.RollingCorrelation`, use the arguments `"R"`, and `"width"`. 
 
 *** =hint
-hint comes here
+`chart.RollingCorrelation` uses two time-series for the argument `"R"`, and the `"width"` is the number of months. 
 
 *** =pre_exercise_code
 ```{r}
@@ -202,35 +205,58 @@ returns_equities <- returns$equities
 
 *** =sample_code
 ```{r}
-# scatter plot
+# Create a scatter plot
 
-# calculation using cor
 
-# merge returns_equities and returns_bonds into returns
+# Find the correlation
 
-# calculation and visualization using chart.Correlation
 
-# rolling estimates using chart.RollingCorrelation
+# Merge returns_equities and returns_bonds 
+
+
+# Find and visualize the correlation using chart.Correlation
+
+
+# Visualize the rolling estimates using chart.RollingCorrelation
 
 ```
 
 *** =solution
 ```{r}
-# scatter plot
+# Create a scatter plot
 chart.Scatter(returns_equities,  returns_bonds)
-# calculation using cor
+
+# Find the correlation
 cor(returns_equities,  returns_bonds)
-# merge returns_equities and returns_bonds into returns
+
+# Merge returns_equities and returns_bonds 
 returns <- merge(returns_equities,returns_bonds)
-# calculation and visualization using chart.Correlation
+
+# Find and visualize the correlation using chart.Correlation
 chart.Correlation(returns)
-# rolling estimates using chart.RollingCorrelation
-chart.RollingCorrelation(returns_equities, bonds,returns_equities,width=24)
+
+# Visualize the rolling estimates using chart.RollingCorrelation
+chart.RollingCorrelation(returns_equities, returns_bonds, width = 24)
+
 ```
 
 *** =sct
 ```{r}
 # sct code
+#1st
+test_function("chart.Scatter", c("x", "y"))
+
+#2nd
+test_function("cor", c("x", "y"))
+
+#3rd
+test_object("returns")
+
+#4th
+test_function("chart.Correlation", c("R"))
+
+#5th
+test_function("chart.RollingCorrelation", c("Ra", "Rb", "width"))
 success_msg("Well done!")
 ```
 
@@ -310,13 +336,17 @@ test_mc(2)
 --- type:NormalExercise lang:r xp:100 skills:1   key:21e408b8c65335ed2599fcb8ff64b5c9b352c374
 ## The asset allocation problem
 
-A realistic portfolio is not only invested in US equities and US bonds. It also seeks for diversification by investing in real estate and commodities, among others. We therefore extend our investment opportunity consisting of the US equities ETF (SPY) and US bonds ETF (AGG) to include also a real estate investment trust (VEIEX) and an ETF tracking the GSCI commodities index (GSG).
+Investors know that each asset that they invest in has risk, and that each asset performs differently. Thats why you will not only invest in US equities and US bonds, bu you will *diversify* your portfolio by investing in real estate, commoditites, among others! 
+
+In this example you have decided to extend your investment opportunity by creating a portfolio that consists of US equities ETF (SPY), US bonds ETF (AGG), a real estate investment trust (VEIEX), and an ETF tracking in the GSCI commodities index (GSG). The plot in the environment displays the performance of these investments.
 
 The monthly returns on those investment are available as the variable `returns` in your workspace. 
 
 *** =instructions
-- Use the function [Return.portfolio](http://www.rdocumentation.org/packages/PerformanceAnalytics/functions/Return.portfolio) to compute the time series of returns for the monthly rebalanced portfolio that is 40% invested in equities, 40% in bonds, 10% in real estate and 10% in commodities. Call this new variable `preturns`.
-- Merge `returns` and `preturns` and apply the function [table.AnnualizedReturns](http://www.rdocumentation.org/packages/PerformanceAnalytics/functions/table.AnnualizedReturns) to the merged object in order to compare the portfolio performance. 
+- Create a vector of the weights of a portfiol that is invested 40% in equities, 40% in bonds, 10% in real estate, and 10% in commodities. Call this new variable `weights`.
+- Calculate the portfolio returns using `Return.portfolio`, and rebalance your weights monthly. Assign this to `preturns`.
+- Merge `returns` and `preturns` and call this `returns_merged`.
+- Use `table.AnnualizedReturns` to compare portfolio performance.
 
 *** =hint
 hint comes here
@@ -351,8 +381,8 @@ plot.zoo(eq_prices , main="Performance across asset classes",ylab="", xlab="",yl
 lines(bond_prices,col="red")
 lines(re_prices,col="blue")
 lines(comm_prices,col="purple")
-legend("topleft", legend=c("Equities (ticker: SPY)","Bonds (ticker: AGG)", "Real estate (ticker: VEIEX)",
-                           "Commodities (ticker: GSG)") , col=c("black","red","blue","purple") , lwd = 1 ,ncol=1)
+legend("topleft", legend=c("Equities (SPY)","Bonds (AGG)", "Real estate (VEIEX)",
+                           "Commodities (GSG)") , col=c("black","red","blue","purple") , lwd = 1 ,ncol=1)
 
 ###
 newdates <- seq(as.Date(time(bond_prices ))[2], length=nrow(bond_prices ), by="1 month") - 2
@@ -369,29 +399,47 @@ returns <- returns[(-1),]
 
 *** =sample_code
 ```{r}
-# sample code
-weights <-  
-preturns <- Return.portfolio(returns, weights,rebalance_on="months")
-# merge
- 
-# compare annualized performance
-table.AnnualizedReturns(returns_merged) 
+# Create a vector of portfolio weights
 
+
+# Calculate portfiolo weights
+
+
+#Merge returns and portfolio returns
+
+
+# Print a table of annualized returns
 ```
 
 *** =solution
 ```{r}
-# sample code
-weights <- c(0.4,0.4,0.1,0.1)
-preturns <- Return.portfolio(returns, weights,rebalance_on="months")
-# merge
-returns_merged <- merge(returns,preturns)
-# compare annualized performance
+# Create a vector of portfolio weights
+weights <- c(0.4, 0.4, 0.1, 0.1)
+
+# Calculate portfiolo weights
+preturns <- Return.portfolio(returns, weights, rebalance_on = "months")
+
+#Merge returns and portfolio returns
+returns_merged <- merge(returns, preturns)
+
+# Print a table of annualized returns
 table.AnnualizedReturns(returns_merged)
 ```
 
 *** =sct
 ```{r}
+#1st
+test_object("weights", incorrect_msg = "Did you calculate the weights correctly?", undefined_msg = "Be sure to calculate the weights!")
+
+#2nd
+test_object("preturns", incorrect_msg = "Did you provide both `returns` and `weights` to `Return.portfolio`?")
+test_function("Return.portfolio", c("R", "weights", "rebalance_on"))
+
+#3rd
+test_object("returns_merged")
+
+#4th
+test_function("table.AnnualizedReturns", "R")
 # sct code
 success_msg("Well done!")
 ```
